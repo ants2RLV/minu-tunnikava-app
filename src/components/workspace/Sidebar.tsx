@@ -36,7 +36,7 @@ export function Sidebar({ selectedBlockId, onClose }: SidebarProps) {
             <Label>Tegevustüüp</Label>
             <Select 
               value={block.type} 
-              onValueChange={(value) => updateBlockType(block.id, value)}
+              onValueChange={(value) => updateBlockType(block.id, value ?? '')}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Vali tüüp..." />

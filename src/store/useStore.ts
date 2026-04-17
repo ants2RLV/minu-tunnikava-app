@@ -10,7 +10,15 @@ export interface Block {
 }
 
 interface TunniKavaState {
+  schoolStage: string;
+  subject: string;
+  topic: string;
+  duration: number;
+  goals: string;
+  needs: string;
   methodology: string;
+  draftContent: string;
+  blocks: Block[];
   setLessonDetails: (details: {
     schoolStage?: string;
     subject?: string;

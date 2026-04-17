@@ -211,7 +211,7 @@ export default function Home() {
                 </SelectContent>
               </Select>
             </div>
-
+ 
             <div className="space-y-2">
               <Label className="font-semibold text-slate-700">Klass *</Label>
               <Select value={localStage} onValueChange={(v) => setLocalStage(v ?? '')}>
