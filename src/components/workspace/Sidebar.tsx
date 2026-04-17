@@ -3,8 +3,14 @@
 import { useStore } from '@/store/useStore';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface SidebarProps {
   selectedBlockId: string | null;
@@ -27,11 +33,20 @@ export function Sidebar({ selectedBlockId, onClose }: SidebarProps) {
 
         <div className="py-6 space-y-6">
           <div className="space-y-2">
-            <Label>Tegevustüüp (Tekst)</Label>
-            <Input 
+            <Label>Tegevustüüp</Label>
+            <Select 
               value={block.type} 
-              onChange={(e) => updateBlockType(block.id, e.target.value)}
-            />
+              onValueChange={(value) => updateBlockType(block.id, value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Vali tüüp..." />
+              </SelectTrigger>
+              <SelectContent>
+                {["Õpetaja teeb", "Individuaalselt", "Paarilisega", "Grupis", "Üle ruumi arutelu"].map(t => (
+                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2 border-t pt-4">

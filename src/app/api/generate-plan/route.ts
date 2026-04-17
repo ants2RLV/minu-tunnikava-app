@@ -5,7 +5,7 @@ const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
 
 export async function POST(request: Request) {
   try {
-    const { subject, grade, topic, duration, objectives, specialNeeds } = await request.json();
+    const { subject, grade, topic, duration, objectives, specialNeeds, methodology } = await request.json();
 
     const apiKey = process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY;
     if (!apiKey) {
@@ -16,7 +16,19 @@ export async function POST(request: Request) {
     const genAI = new GoogleGenerativeAI(apiKey);
     
     const prompt = `
-Oled kogenud Eesti õpetaja. Koosta struktureeritud ja põhjalik tunnikava järgmiste andmete põhjal:
+Oled kogenud Eesti õpetaja. Koosta struktureeritud ja põhjalik tunnikava, lähtudes Eesti riiklikest õppekavadest (PRÕK 2025 ja GRÕK 2025).
+Kasuta LÕOKE portaali ja HTM-i lõimingu kogumiku põhimõtteid: õppimine peab olema tähenduslik, holistiline ja seotud õpilase igapäevaeluga.
+
+METOODILINE RAAMISTIK:
+Sinu ülesanne on koostada tunnikava kasutades TÄPSELT järgmist metoodilist struktuuri: ${methodology || 'Klassikaline'}.
+- Kui meetod on 5E, peavad pealkirjad olema: Engage, Explore, Explain, Elaborate, Evaluate.
+- Kui meetod on PPP, peavad pealkirjad olema: Presentation, Practice, Production.
+- Kui meetod on BackwardDesign (Tagurpidi disain), peavad pealkirjad olema: Eesmärgid, Tõendusmaterjal, Õpitegevused.
+- Kui meetod on Hunter, järgi Hunteri 7-sammulist kava.
+- Kui meetod on 4A, peavad pealkirjad olema: Anchor, Add, Apply, Away.
+- Kui meetod on Klassikaline, kasuta: Häälestus, Põhiosa, Konsolideerimine, Lõpetus.
+
+ANDMED:
 Aine: ${subject}
 Klass: ${grade}
 Teema: ${topic}
@@ -24,16 +36,26 @@ Kestus: ${duration} min
 Õpieesmärgid: ${objectives}
 Erivajadused/Meetodid: ${specialNeeds || 'Ei ole täpsustatud'}
 
-Väljasta tulemus ILUSAS MARKDOWN vormingus. 
-Kasuta kindlasti pealkirju:
-## Häälestus
-## Põhiosa
-## Lõpetus
+KOHUSTUSLIKUD SEKTSIOONID JA STRUKTUUR:
+Väljasta tulemus ILUSAS MARKDOWN vormingus.
 
-Lisa iga tegevuse juurde kellaaeg/kestus sulgudes, näiteks (5 min) või (15 min). See on kriitiliselt oluline hilisema parsimise jaoks!
-Kasuta paksus kirjas teksti oluliste mõistete jaoks ja täpploendeid tegevuste kirjeldamiseks. 
-ÄRA tagasta JSON-it ega muud ümbritsevat teksti, vaid puhas Markdown tekst, mis sobib otse kuvamiseks.
-Toeta matemaatilisi sümboleid LaTeX vormingus (nt $x^2$ või $\\frac{1}{2}$), kui teema seda nõuab.
+## Üldinfo ja Lõiming
+- **Lõiming teiste ainetega**: Too välja vähemalt üks konkreetne seos mõne teise õppeainega.
+- **Läbiv teema**: Vali ja nimeta üks läbiv teema ning selgita selle rolli tunnis.
+- **Eluline näide**: Kirjelda ühte reaalset elulist probleemi või situatsiooni.
+
+Lisa sektsioonid vastavalt valitud meetodile (${methodology}):
+(Kasuta ## pealkirju iga etapi jaoks)
+
+JUHISED SISU JAOKS:
+1. Eelista aktiivõpet, uurimuslikku õpet ja projektõppe elemente. Vähenda passiivset loenguvormi.
+2. Iga tegevuse (## pealkiri) juures pead sa määrama TÄPSELT ühe viiest klotsi tüübist: [Õpetaja teeb, Individuaalselt, Paarilisega, Grupis, Üle ruumi arutelu].
+3. Kasuta formaati: ## Tegevuse nimi (kestus minutites) (Klotsi tüüp). 
+   Näide: ## Teema tutvustus (10 min) (Õpetaja teeb) või ## Grupiarutelu (15 min) (Grupis).
+4. See kestus sulgudes on kriitiliselt oluline parsimise jaoks!
+5. Kasuta paksus kirjas teksti oluliste mõistete jaoks ja täpploendeid tegevuste kirjeldamiseks.
+6. Toeta matemaatilisi sümboleid LaTeX vormingus (nt $x^2$ või $\\frac{1}{2}$), kui teema seda nõuab.
+7. ÄRA tagasta JSON-it ega muud ümbritsevat teksti, vaid puhas Markdown tekst.
 `;
 
     // Mudelite nimekiri ja korduskatsete arv

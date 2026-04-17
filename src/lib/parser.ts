@@ -15,18 +15,32 @@ export function parseTextToBlocks(text: string): Block[] {
     const content = match[3] ? match[3].trim() : "";
     const fullContent = title + "\n\n" + content;
 
-    let type = "Indiv. töö";
+    let type = "Individuaalselt";
     let colorClass = "bg-green-300";
 
     const lowerContent = fullContent.toLowerCase();
-    if (lowerContent.includes("häälestus") || lowerContent.includes("arutelu") || lowerContent.includes("kokkuvõte") || lowerContent.includes("lõpetus")) {
-      type = "Ruumitöö"; colorClass = "bg-purple-300";
-    } else if (lowerContent.includes("loeng") || lowerContent.includes("selgitus") || lowerContent.includes("tutvustus")) {
-      type = "Loeng"; colorClass = "bg-red-300";
-    } else if (lowerContent.includes("grupitöö") || lowerContent.includes("rühmatöö") || lowerContent.includes("elulised näited")) {
-      type = "Grupitöö"; colorClass = "bg-blue-300";
+    
+    // Prioriteet 1: Otsesed uued tüübinimed
+    if (lowerContent.includes("õpetaja teeb")) {
+      type = "Õpetaja teeb"; colorClass = "bg-red-300";
+    } else if (lowerContent.includes("individuaalselt")) {
+      type = "Individuaalselt"; colorClass = "bg-green-300";
+    } else if (lowerContent.includes("paarilisega")) {
+      type = "Paarilisega"; colorClass = "bg-yellow-300";
+    } else if (lowerContent.includes("grupis")) {
+      type = "Grupis"; colorClass = "bg-blue-300";
+    } else if (lowerContent.includes("üle ruumi arutelu")) {
+      type = "Üle ruumi arutelu"; colorClass = "bg-purple-300";
+    } 
+    // Prioriteet 2: Vanad märksõnad ja tuletamine
+    else if (lowerContent.includes("häälestus") || lowerContent.includes("arutelu") || lowerContent.includes("kokkuvõte") || lowerContent.includes("lõpetus") || lowerContent.includes("engage") || lowerContent.includes("anchor") || lowerContent.includes("away")) {
+      type = "Üle ruumi arutelu"; colorClass = "bg-purple-300";
+    } else if (lowerContent.includes("loeng") || lowerContent.includes("selgitus") || lowerContent.includes("tutvustus") || lowerContent.includes("presentation") || lowerContent.includes("modeling")) {
+      type = "Õpetaja teeb"; colorClass = "bg-red-300";
+    } else if (lowerContent.includes("grupitöö") || lowerContent.includes("rühmatöö") || lowerContent.includes("explore") || lowerContent.includes("practice") || lowerContent.includes("production") || lowerContent.includes("apply") || lowerContent.includes("elulised näited")) {
+      type = "Grupis"; colorClass = "bg-blue-300";
     } else if (lowerContent.includes("paaristöö")) {
-      type = "Paaristöö"; colorClass = "bg-yellow-300";
+      type = "Paarilisega"; colorClass = "bg-yellow-300";
     }
 
     const blockCount = Math.floor(duration / 5);

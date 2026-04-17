@@ -20,14 +20,19 @@ export async function POST(request: Request) {
     
     const prompt = `
 Sinu ülesanne on analüüsida õpetaja tunnikava teksti ja jagada see TÄPSELT üheksaks 5-minutiliseks klotsiks (kokku 45 min). 
-Iga klots peab olema JSON objekt massiivis, millel on järgnevad väljad:
-- "id": (unikaalne string)
-- "time": (nt '0-5 min')
-- "type": (Vali üks: 'Ruumitöö', 'Loeng', 'Grupitöö', 'Indiv. töö', 'Paaristöö')
-- "colorClass": (Vastavalt tüübile: 'bg-purple-300' ruumitööle, 'bg-red-300' loengule, 'bg-blue-300' grupitööle, 'bg-green-300' indiv tööle, 'bg-yellow-300' paaristööle)
-- "content": (Põhjalik tekst selle 5 minuti tegevuse kohta, toetab matemaatilisi sümboleid ka latex formatis).
+Kava võib olla koostatud erinevate metoodikate järgi.
 
-Kui algne kava on lühem kui 45 min, täida ülejäänud puuduolevad klotsid ('Indiv. töö' ja neutraalse sisuga "Varuaeg / Iseseisev töö").
+Määra igale klotsile üks viiest tüübist ja vastav värv:
+1. 'Õpetaja teeb' (Loeng, selgitus, esitlemine) -> bg-red-300
+2. 'Individuaalselt' (Iseseisev töö, harjutamine) -> bg-green-300
+3. 'Paarilisega' (Paaristöö) -> bg-yellow-300
+4. 'Grupis' (Grupitöö, koostöö) -> bg-blue-300
+5. 'Üle ruumi arutelu' (Häälestus, arutelu, kokkuvõte, analüüs) -> bg-purple-300
+
+Analüüsi teksti pealkirju ja sisu. Kui pealkirjas on sulgudes tüüp (nt "(Grupis)"), kasuta seda. 
+Kui tüüpi pole märgitud, tuleta see sisu põhjal kõige sobivama variandi järgi.
+
+Iga klots peab olema JSON objekt massiivis: {id, time, type, colorClass, content}.
 Tagasta AINULT kehtiv JSON massiiv, mis sisaldab täpselt 9 objekti.
 
 TUNNIKAVA TEKST:

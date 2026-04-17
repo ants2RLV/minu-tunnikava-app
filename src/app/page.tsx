@@ -29,17 +29,54 @@ export default function Home() {
   const [localDuration, setLocalDuration] = useState(store.duration.toString());
   const [localGoals, setLocalGoals] = useState(store.goals);
   const [localNeeds, setLocalNeeds] = useState(store.needs);
+  const [localMethodology, setLocalMethodology] = useState(store.methodology || 'Klassikaline');
   const [isGenerating, setIsGenerating] = useState(false);
   const [genStatus, setGenStatus] = useState<'idle' | 'writing'>('idle');
 
-  const ESTONIAN_SUBJECTS = [
-    "Ajalugu", "Bioloogia", "Eesti keel", "Füüsika", "Geograafia", 
-    "Informaatika", "Inglise keel (A-võõrkeel)", "Inimeseõpetus", 
-    "Keemia", "Kehaline kasvatus", "Kirjandus", "Kunst", 
-    "Loodusõpetus", "Matemaatika", "Muusika", 
-    "Tehnoloogiaõpetus / Käsitöö ja kodundus", 
-    "Vene keel (B-võõrkeel)", "Ühiskonnaõpetus", "Muu valikaine"
-  ].sort((a, b) => a.localeCompare('et'));
+  const METHODOLOGIES = [
+    {
+      id: 'Klassikaline',
+      name: 'Klassikaline',
+      desc: 'Sissejuhatus, Põhiosa, Kokkuvõte. Sobib igapäevaseks tunniks.',
+      steps: ['Häälestus', 'Põhiosa', 'Konsolideerimine', 'Lõpetus'],
+      useCase: 'Universaalne valik igaks aineks.'
+    },
+    {
+      id: '5E',
+      name: '5E õpitsükkel',
+      desc: 'Uurimuslik õpe: Kaasamine, Avastamine, Selgitamine, Täiendamine, Hindamine.',
+      steps: ['Engage', 'Explore', 'Explain', 'Elaborate', 'Evaluate'],
+      useCase: 'Parim loodusteaduste avastamisrõõmuks ja uurimuslikuks õppeks.'
+    },
+    {
+      id: 'PPP',
+      name: 'PPP mudel',
+      desc: 'Esitlemine, Harjutamine, Tootmine (Presentation, Practice, Production).',
+      steps: ['Presentation', 'Practice', 'Production'],
+      useCase: 'Ideaalne keeleõppe ja uute väljendite omandamiseks.'
+    },
+    {
+      id: 'BackwardDesign',
+      name: 'Tagurpidi disain',
+      desc: 'Eesmärk -> Hindamine -> Tegevused. Alusta lõpptulemusest.',
+      steps: ['Eesmärgid', 'Tõendusmaterjal', 'Õpitegevused'],
+      useCase: 'Tugev fookus õpitulemustele ja nende tõendamisele.'
+    },
+    {
+      id: 'Hunter',
+      name: 'Hunteri kava',
+      desc: '7-sammuline kava oskuste õpetamiseks.',
+      steps: ['Anticipatory Set', 'Input', 'Modeling', 'Check Understanding', 'Guided Practice', 'Independent Practice'],
+      useCase: 'Praktiliste oskuste ja protseduuride õpetamiseks.'
+    },
+    {
+      id: '4A',
+      name: '4A raamistik',
+      desc: 'Kogemuspõhine õpe: Ankur, Lisa, Rakenda, Kaasa (Anchor, Add, Apply, Away).',
+      steps: ['Anchor', 'Add', 'Apply', 'Away'],
+      useCase: 'Tähendusliku seose loomiseks eelteadmiste ja uue info vahel.'
+    }
+  ];
 
   const handleGenerate = async () => {
     if (!localSubject || !localStage || !localTopic || !localGoals) {
@@ -57,7 +94,8 @@ export default function Home() {
       topic: localTopic,
       duration: parseInt(localDuration, 10) || 45,
       goals: localGoals,
-      needs: localNeeds
+      needs: localNeeds,
+      methodology: localMethodology
     });
 
     let retryCount = 0;
@@ -74,7 +112,8 @@ export default function Home() {
             topic: localTopic,
             duration: localDuration,
             objectives: localGoals,
-            specialNeeds: localNeeds
+            specialNeeds: localNeeds,
+            methodology: localMethodology
           }),
         });
 
@@ -109,6 +148,15 @@ export default function Home() {
     executeGeneration();
   };
 
+  const ESTONIAN_SUBJECTS = [
+    "Ajalugu", "Bioloogia", "Eesti keel", "Füüsika", "Geograafia", 
+    "Informaatika", "Inglise keel (A-võõrkeel)", "Inimeseõpetus", 
+    "Keemia", "Kehaline kasvatus", "Kirjandus", "Kunst", 
+    "Loodusõpetus", "Matemaatika", "Muusika", 
+    "Tehnoloogiaõpetus / Käsitöö ja kodundus", 
+    "Vene keel (B-võõrkeel)", "Ühiskonnaõpetus", "Muu valikaine"
+  ].sort((a, b) => a.localeCompare('et'));
+
   const handleManualEntry = () => {
     if (!localSubject || !localStage || !localTopic) {
       alert('Täida vähemalt Aine, Klass ja Teema, et ajateljel alustada!');
@@ -121,7 +169,8 @@ export default function Home() {
       topic: localTopic,
       duration: parseInt(localDuration, 10) || 45,
       goals: localGoals,
-      needs: localNeeds
+      needs: localNeeds,
+      methodology: localMethodology
     });
 
     // Algatame puhta lehe
@@ -211,11 +260,58 @@ export default function Home() {
             />
           </div>
 
-          {/* Rida 4 */}
+          {/* Rida 4 - Metoodika Valik */}
+          <div className="space-y-3">
+            <Label className="font-semibold text-slate-700">Vali tunni ülesehitus (Metoodika)</Label>
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide px-1 -mx-1">
+              {METHODOLOGIES.map((m) => (
+                <div 
+                  key={m.id}
+                  onClick={() => setLocalMethodology(m.id)}
+                  className={`
+                    flex-shrink-0 w-48 p-4 rounded-xl border-2 transition-all cursor-pointer relative group
+                    ${localMethodology === m.id 
+                      ? 'border-blue-500 bg-blue-50 shadow-md ring-2 ring-blue-200' 
+                      : 'border-slate-100 bg-slate-50 hover:border-slate-300'}
+                  `}
+                >
+                  <h3 className={`font-bold text-sm ${localMethodology === m.id ? 'text-blue-700' : 'text-slate-700'}`}>
+                    {m.name}
+                  </h3>
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {m.steps.slice(0, 3).map(s => (
+                      <span key={s} className="text-[10px] bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-500">
+                        {s}
+                      </span>
+                    ))}
+                    {m.steps.length > 3 && <span className="text-[10px] text-slate-400">...</span>}
+                  </div>
+
+                  {/* Infoaken (Hover Popover) */}
+                  <div className="absolute bottom-full left-0 mb-3 w-64 p-4 bg-slate-900 text-white rounded-xl shadow-2xl opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 transition-all z-50 text-xs">
+                    <p className="font-bold text-blue-400 mb-1">Millal valida?</p>
+                    <p className="mb-3 text-slate-300 italic">{m.useCase}</p>
+                    <p className="font-bold text-blue-400 mb-1">Etapid:</p>
+                    <ul className="space-y-1">
+                      {m.steps.map((s, idx) => (
+                        <li key={s} className="flex items-center gap-2">
+                          <span className="w-4 h-4 rounded-full bg-slate-800 flex items-center justify-center text-[10px]">{idx + 1}</span>
+                          {s}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="absolute top-full left-6 w-3 h-3 bg-slate-900 rotate-45 -translate-y-1/2"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Rida 5 */}
           <div className="space-y-2">
             <Label className="font-semibold text-slate-700">Erivajadused / Meetodid (Valikuline)</Label>
             <Textarea 
-              className="resize-none h-24"
+              className="resize-none h-20"
               placeholder="Näiteks: Rühmatöö, visuaalsed abimaterjalid..."
               value={localNeeds}
               onChange={(e) => setLocalNeeds(e.target.value)}

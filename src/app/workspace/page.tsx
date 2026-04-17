@@ -57,11 +57,11 @@ export default function WorkspacePage() {
   const handleDownloadDocx = () => {
     // Värvide vastavustabel (Tailwind -> HEX)
     const colorMap: Record<string, string> = {
-      'bg-purple-300': '#d8b4fe',
-      'bg-red-300': '#fca5a5',
-      'bg-blue-300': '#93c5fd',
-      'bg-green-300': '#86efac',
-      'bg-yellow-300': '#fde047',
+      'bg-red-300': '#fca5a5',      // Õpetaja teeb
+      'bg-green-300': '#86efac',    // Individuaalselt
+      'bg-yellow-300': '#fde047',   // Paarilisega
+      'bg-blue-300': '#93c5fd',     // Grupis
+      'bg-purple-300': '#d8b4fe',   // Üle ruumi arutelu
       'bg-slate-300': '#cbd5e1'
     };
 
@@ -247,6 +247,22 @@ export default function WorkspacePage() {
           <p className="text-sm text-slate-400 mt-4 px-2 text-center">
             Pukseeri klotse horisontaalsel teljel nende järjekorra muutmiseks. Seadete avamiseks klõpsa klotsil.
           </p>
+
+          {/* Legend */}
+          <div className="mt-8 flex flex-wrap justify-center gap-6 px-4 py-4 bg-white/50 rounded-xl border border-slate-100">
+            {[
+              { label: "Õpetaja teeb", color: "bg-red-300" },
+              { label: "Individuaalselt", color: "bg-green-300" },
+              { label: "Paarilisega", color: "bg-yellow-300" },
+              { label: "Grupis", color: "bg-blue-300" },
+              { label: "Üle ruumi arutelu", color: "bg-purple-300" },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center gap-2">
+                <div className={`w-4 h-4 rounded-sm ${item.color} shadow-sm`} />
+                <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">{item.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </main>
 

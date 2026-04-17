@@ -10,14 +10,7 @@ export interface Block {
 }
 
 interface TunniKavaState {
-  schoolStage: string;
-  subject: string;
-  topic: string;
-  duration: number;
-  goals: string;
-  needs: string;
-  draftContent: string;
-  blocks: Block[];
+  methodology: string;
   setLessonDetails: (details: {
     schoolStage?: string;
     subject?: string;
@@ -25,6 +18,7 @@ interface TunniKavaState {
     duration?: number;
     goals?: string;
     needs?: string;
+    methodology?: string;
   }) => void;
   setDraftContent: (html: string) => void;
   setBlocks: (blocks: Block[]) => void;
@@ -43,6 +37,7 @@ export const useStore = create<TunniKavaState>()(
       duration: 45,
       goals: '',
       needs: '',
+      methodology: 'Klassikaline',
       draftContent: '',
       blocks: [],
       setLessonDetails: (details) =>
@@ -55,23 +50,33 @@ export const useStore = create<TunniKavaState>()(
             b.id === id ? { ...b, content } : b
           ),
         }),
-      updateBlockType: (id, type) =>
+      updateBlockType: (id, type) => {
+        const colorMapping: Record<string, string> = {
+          'Õpetaja teeb': 'bg-red-300',
+          'Individuaalselt': 'bg-green-300',
+          'Paarilisega': 'bg-yellow-300',
+          'Grupis': 'bg-blue-300',
+          'Üle ruumi arutelu': 'bg-purple-300'
+        };
+        const colorClass = colorMapping[type] || 'bg-slate-300';
+        
         set({
           blocks: get().blocks.map((b) =>
-            b.id === id ? { ...b, type } : b
+            b.id === id ? { ...b, type, colorClass } : b
           ),
-        }),
+        });
+      },
       initializeBlocks: () => {
         if (get().blocks.length > 0) return;
         
-        // Vormistame faili nullist tühjade blocks'idega
+        // Vormistame faili nullist tühjade klotsidega
         const emptyBlocks: Block[] = [];
         let currentMinute = 0;
         while (currentMinute < 45) {
           emptyBlocks.push({
             id: `init-${get().duration}-${currentMinute}`,
             time: `${currentMinute}-${currentMinute + 5} min`,
-            type: "Indiv. töö",
+            type: "Individuaalselt",
             colorClass: "bg-green-300",
             content: "Iseseisev töö / Varu"
           });
@@ -80,7 +85,7 @@ export const useStore = create<TunniKavaState>()(
         set({ blocks: emptyBlocks });
       },
       resetBlocks: () => {
-        // Vormistame faili nullist tühjade blocks'idega sunnitult (manuaalseks sisestuseks)
+        // Vormistame faili nullist tühjade klotsidega sunnitult (manuaalseks sisestuseks)
         const emptyBlocks: Block[] = [];
         let currentMinute = 0;
         const totalDuration = get().duration || 45;
@@ -88,7 +93,7 @@ export const useStore = create<TunniKavaState>()(
           emptyBlocks.push({
             id: `manual-${currentMinute}`,
             time: `${currentMinute}-${currentMinute + 5} min`,
-            type: "Indiv. töö",
+            type: "Individuaalselt",
             colorClass: "bg-green-300",
             content: "Sisesta tegevus siia"
           });
