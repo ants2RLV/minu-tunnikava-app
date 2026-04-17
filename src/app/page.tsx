@@ -243,6 +243,8 @@ export default function Home() {
               <Label className="font-semibold text-slate-700">Kestus (min) *</Label>
               <Input 
                 type="number" 
+                min="5"
+                max="90"
                 value={localDuration}
                 onChange={(e) => setLocalDuration(e.target.value)}
               />

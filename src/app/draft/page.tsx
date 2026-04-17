@@ -161,7 +161,10 @@ export default function DraftPage() {
       const response = await fetch('/api/parse-blocks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: draftContent }),
+        body: JSON.stringify({ 
+          text: draftContent,
+          duration: duration 
+        }),
       });
 
       if (!response.ok) {

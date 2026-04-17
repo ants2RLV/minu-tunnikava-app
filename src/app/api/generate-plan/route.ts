@@ -49,13 +49,15 @@ Lisa sektsioonid vastavalt valitud meetodile (${methodology}):
 
 JUHISED SISU JAOKS:
 1. Eelista aktiivõpet, uurimuslikku õpet ja projektõppe elemente. Vähenda passiivset loenguvormi.
-2. Iga tegevuse (## pealkiri) juures pead sa määrama TÄPSELT ühe viiest klotsi tüübist: [Õpetaja teeb, Individuaalselt, Paarilisega, Grupis, Üle ruumi arutelu].
-3. Kasuta formaati: ## Tegevuse nimi (kestus minutites) (Klotsi tüüp). 
+2. Planeeri tegevused nii, et kava kogupikkus on TÄPSELT ${duration} minutit. 
+3. Jaota sisu loogiliselt ${Math.floor(parseInt(duration as string) / 5)} viieminutiliseks klotsiks.
+4. Iga tegevuse (## pealkiri) juures pead sa määrama TÄPSELT ühe viiest klotsi tüübist: [Õpetaja teeb, Individuaalselt, Paarilisega, Grupis, Üle ruumi arutelu].
+5. Kasuta formaati: ## Tegevuse nimi (kestus minutites) (Klotsi tüüp). 
    Näide: ## Teema tutvustus (10 min) (Õpetaja teeb) või ## Grupiarutelu (15 min) (Grupis).
-4. See kestus sulgudes on kriitiliselt oluline parsimise jaoks!
-5. Kasuta paksus kirjas teksti oluliste mõistete jaoks ja täpploendeid tegevuste kirjeldamiseks.
-6. Toeta matemaatilisi sümboleid LaTeX vormingus (nt $x^2$ või $\\frac{1}{2}$), kui teema seda nõuab.
-7. ÄRA tagasta JSON-it ega muud ümbritsevat teksti, vaid puhas Markdown tekst.
+6. See kestus sulgudes on kriitiliselt oluline parsimise jaoks!
+7. Kasuta paksus kirjas teksti oluliste mõistete jaoks ja täpploendeid tegevuste kirjeldamiseks.
+8. Toeta matemaatilisi sümboleid LaTeX vormingus (nt $x^2$ või $\\frac{1}{2}$), kui teema seda nõuab.
+9. ÄRA tagasta JSON-it ega muud ümbritsevat teksti, vaid puhas Markdown tekst.
 `;
 
     // Mudelite nimekiri ja korduskatsete arv

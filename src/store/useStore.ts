@@ -77,10 +77,11 @@ export const useStore = create<TunniKavaState>()(
       initializeBlocks: () => {
         if (get().blocks.length > 0) return;
         
-        // Vormistame faili nullist tühjade klotsidega
+        // Vormistame faili nullist tühjade klotsidega vastavalt kestusele
         const emptyBlocks: Block[] = [];
         let currentMinute = 0;
-        while (currentMinute < 45) {
+        const totalDuration = get().duration || 45;
+        while (currentMinute < totalDuration) {
           emptyBlocks.push({
             id: `init-${get().duration}-${currentMinute}`,
             time: `${currentMinute}-${currentMinute + 5} min`,

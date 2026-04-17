@@ -5,7 +5,8 @@ const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
 
 export async function POST(request: Request) {
   try {
-    const { text: inputText } = await request.json();
+    const { text: inputText, duration = 45 } = await request.json();
+    const blockCount = Math.floor(parseInt(duration as string) / 5);
     if (!inputText) {
       return NextResponse.json({ error: 'Tekst on nõutud' }, { status: 400 });
     }
@@ -19,7 +20,7 @@ export async function POST(request: Request) {
     const genAI = new GoogleGenerativeAI(apiKey);
     
     const prompt = `
-Sinu ülesanne on analüüsida õpetaja tunnikava teksti ja jagada see TÄPSELT üheksaks 5-minutiliseks klotsiks (kokku 45 min). 
+Sinu ülesanne on analüüsida õpetaja tunnikava teksti ja jagada see TÄPSELT ${blockCount} viieminutiliseks klotsiks (kokku ${duration} min). 
 Kava võib olla koostatud erinevate metoodikate järgi.
 
 Määra igale klotsile üks viiest tüübist ja vastav värv:
@@ -33,7 +34,7 @@ Analüüsi teksti pealkirju ja sisu. Kui pealkirjas on sulgudes tüüp (nt "(Gru
 Kui tüüpi pole märgitud, tuleta see sisu põhjal kõige sobivama variandi järgi.
 
 Iga klots peab olema JSON objekt massiivis: {id, time, type, colorClass, content}.
-Tagasta AINULT kehtiv JSON massiiv, mis sisaldab täpselt 9 objekti.
+Tagasta AINULT kehtiv JSON massiiv, mis sisaldab täpselt ${blockCount} objekti.
 
 TUNNIKAVA TEKST:
 ${inputText}

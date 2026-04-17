@@ -6,7 +6,7 @@ import { useStore, Block } from '@/store/useStore';
 import { Timeline } from '@/components/workspace/Timeline';
 import { Sidebar } from '@/components/workspace/Sidebar';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Download, Copy, FileUp, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Download, Copy, FileUp, ChevronDown, LayoutDashboard } from 'lucide-react';
 import Link from 'next/link';
 import {
   DropdownMenu,
@@ -108,8 +108,35 @@ export default function WorkspacePage() {
         
         <table>
           <tr>
-            ${blocksHtml}
+            ${blocks.slice(0, blocks.length > 9 ? Math.ceil(blocks.length / 2) : blocks.length).map((b, i) => {
+              const bgColor = colorMap[b.colorClass || ''] || '#e2e8f0';
+              const timeRange = b.time || `${i * 5}-${(i + 1) * 5} min`;
+              const summary = b.content.length > 100 ? b.content.substring(0, 97) + '...' : b.content;
+              return `
+                <td style="width: 80pt; padding: 8pt; background-color: ${bgColor}; border: 1pt solid #94a3b8; vertical-align: top; border-radius: 4pt;">
+                  <div style="font-size: 8pt; font-weight: bold; color: #475569; margin-bottom: 2pt;">${timeRange}</div>
+                  <div style="font-size: 9pt; font-weight: 800; color: #1e293b; margin-bottom: 4pt;">${b.type}</div>
+                  <div style="font-size: 8pt; line-height: 1.1; color: #334155;">${summary}</div>
+                </td>
+              `;
+            }).join('')}
           </tr>
+          ${blocks.length > 9 ? `
+          <tr>
+            ${blocks.slice(Math.ceil(blocks.length / 2)).map((b, i) => {
+              const localIdx = i + Math.ceil(blocks.length / 2);
+              const bgColor = colorMap[b.colorClass || ''] || '#e2e8f0';
+              const timeRange = b.time || `${localIdx * 5}-${(localIdx + 1) * 5} min`;
+              const summary = b.content.length > 100 ? b.content.substring(0, 97) + '...' : b.content;
+              return `
+                <td style="width: 80pt; padding: 8pt; background-color: ${bgColor}; border: 1pt solid #94a3b8; vertical-align: top; border-radius: 4pt;">
+                  <div style="font-size: 8pt; font-weight: bold; color: #475569; margin-bottom: 2pt;">${timeRange}</div>
+                  <div style="font-size: 9pt; font-weight: 800; color: #1e293b; margin-bottom: 4pt;">${b.type}</div>
+                  <div style="font-size: 8pt; line-height: 1.1; color: #334155;">${summary}</div>
+                </td>
+              `;
+            }).join('')}
+          </tr>` : ''}
         </table>
 
         <div style="margin-top: 25pt; font-size: 9pt; color: #94a3b8; font-style: italic;">
@@ -130,6 +157,125 @@ export default function WorkspacePage() {
     document.body.removeChild(link);
   };
 
+  const handleDownloadHtml = () => {
+    const colorMap: Record<string, string> = {
+      'bg-red-300': '#fca5a5',
+      'bg-green-300': '#86efac',
+      'bg-yellow-300': '#fde047',
+      'bg-blue-300': '#93c5fd',
+      'bg-purple-300': '#d8b4fe',
+      'bg-slate-300': '#cbd5e1'
+    };
+ 
+    const blocksHtml = blocks.map((b, i) => {
+      const bgColor = b.colorClass || 'bg-slate-300';
+      const timeRange = b.time || `${i * 5}-${(i + 1) * 5} min`;
+      
+      return `
+        <div class="block-item group border-2 border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-all cursor-pointer" onclick="toggleBlock(this)">
+          <div class="h-4 ${bgColor} w-full border-b border-slate-100 italic"></div>
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">${timeRange}</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-bold">${b.type}</span>
+            </div>
+            <h3 class="text-lg font-extrabold text-slate-800 leading-tight mb-2">${b.content.split('\n')[0].replace(/#/g, '')}</h3>
+            <div class="content-preview text-slate-500 text-sm line-clamp-2">
+              ${b.content}
+            </div>
+            <div class="content-full hidden mt-4 pt-4 border-t border-slate-100 text-slate-700 leading-relaxed whitespace-pre-wrap">
+              ${b.content}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+ 
+    const html = `
+ <!DOCTYPE html>
+ <html lang="et">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Tunnikava: ${topic || 'Interaktiivne vaade'}</title>
+     <script src="https://cdn.tailwindcss.com"></script>
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+     <style>
+         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+         .block-item.active { grid-column: span 3; }
+         .block-item.active .content-preview { display: none; }
+         .block-item.active .content-full { display: block; }
+         @media print {
+             body { background: white; padding: 0; }
+             .no-print { display: none; }
+             .content-full { display: block !important; }
+             .content-preview { display: none !important; }
+             .block-item { break-inside: avoid; border: 1px solid #e2e8f0 !important; margin-bottom: 2rem; box-shadow: none !important; }
+             .grid { display: block !important; }
+         }
+     </style>
+ </head>
+ <body class="p-8 md:p-16">
+     <div class="max-w-6xl mx-auto">
+         <header class="mb-12 border-b-2 border-slate-200 pb-8 flex justify-between items-end">
+             <div>
+                 <h1 class="text-4xl font-black text-slate-900 mb-2">${topic || 'Nimetu tunnikava'}</h1>
+                 <p class="text-slate-500 font-medium">
+                     ${subject} • ${schoolStage} • ${blocks.length * 5} minutit
+                 </p>
+             </div>
+             <div class="text-right no-print">
+                 <button onclick="window.print()" class="bg-slate-900 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-800 transition-colors">Trüki / Salvesta PDF</button>
+             </div>
+         </header>
+ 
+         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-16">
+             ${blocksHtml}
+         </div>
+ 
+         <footer class="mt-24 pt-8 border-t border-slate-200 text-center text-slate-400 text-sm italic no-print">
+             Loodud Klotsitehnikaga – interaktiivne tunniplaneerimise tööriist
+         </footer>
+     </div>
+ 
+     <script>
+         function toggleBlock(el) {
+             const wasActive = el.classList.contains('active');
+             // Close all other blocks
+             document.querySelectorAll('.block-item').forEach(b => b.classList.remove('active'));
+             // Toggle current if it wasn't active
+             if (!wasActive) {
+                 el.classList.add('active');
+                 el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+             }
+         }
+ 
+         document.addEventListener("DOMContentLoaded", function() {
+             renderMathInElement(document.body, {
+                 delimiters: [
+                     {left: "$$", right: "$$", display: true},
+                     {left: "$", right: "$", display: false}
+                 ]
+             });
+         });
+     </script>
+ </body>
+ </html>
+     `;
+     
+     const blob = new Blob([html], { type: 'text/html' });
+     const url = URL.createObjectURL(blob);
+     const link = document.createElement('a');
+     link.href = url;
+     link.download = `Tunnikava_${topic?.replace(/\s+/g, '_') || 'Interaktiivne'}.html`;
+     document.body.appendChild(link);
+     link.click();
+     document.body.removeChild(link);
+   };
+
   // Legacy local parser removed in favor of AI API
 
   const parseAndImportBlocks = async () => {
@@ -140,7 +286,10 @@ export default function WorkspacePage() {
       const response = await fetch('/api/parse-blocks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: importText }),
+        body: JSON.stringify({ 
+          text: importText,
+          duration: (blocks.length * 5) || 45
+        }),
       });
 
       if (!response.ok) throw new Error('AI analüüs ebaõnnestus');
@@ -230,6 +379,9 @@ export default function WorkspacePage() {
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleDownloadDocx} className="cursor-pointer">
                 <Download className="mr-2 h-4 w-4" /> Laadi alla (.docx)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDownloadHtml} className="cursor-pointer">
+                <LayoutDashboard className="mr-2 h-4 w-4" /> Interaktiivne HTML (.html)
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
